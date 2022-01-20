@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:id="@+id/actionBar"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_height="?actionBarSize">
+
+            <ImageView
+                android:id="@+id/backBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:padding="5dp"
+                android:src="@drawable/arrow" />
+
+            <ImageView
+                android:layout_width="40dp"
+                android:padding="5dp"
+                android:src="@drawable/ic_baseline_delete_outline_24"
+                android:id="@+id/delete"
+                android:layout_toStartOf="@id/check"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"
+                android:layout_height="40dp"/>
+
+            <ImageView
+                android:layout_width="40dp"
+                android:id="@+id/check"
+                android:padding="5dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="10dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/check"
+                android:layout_height="40dp"/>
+
+
+        </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:background="@android:color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/actionBar"
+            android:layout_height="0.5dp"/>
+
+        <TextView
+            android:background="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/actionBar"
+            android:layout_width="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_percent=".6"
+            android:padding="15sp"
+            android:id="@+id/currentDateTime"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:textStyle="bold|italic"
+            android:layout_marginStart="20sp"
+            android:layout_marginTop="20sp"
+            android:layout_marginEnd="20sp"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="0dp"
+            android:id="@+id/characters"
+            android:text="Character : 0"
+            android:layout_marginTop="20sp"
+            app:layout_constraintWidth_percent=".3"
+            android:padding="15sp"
+            android:layout_marginEnd="20sp"
+            app:layout_constraintTop_toBottomOf="@id/actionBar"
+            app:layout_constraintStart_toEndOf="@id/currentDateTime"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            app:layout_constraintTop_toBottomOf="@id/currentDateTime"
+            android:background="@color/white"
+            android:padding="15sp"
+            android:id="@+id/text"
+            android:layout_marginStart="20sp"
+            android:hint="@string/enter_the_text"
+            android:layout_marginTop="20sp"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:layout_marginEnd="20sp"
+            android:layout_height="wrap_content"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

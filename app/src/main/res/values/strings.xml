@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">NotePad</string>
+    <string name="enter_the_text">Enter the text</string>
+    <string name="title">Title</string>
+    <string name="login_with_mobile">Login With Mobile</string>
+    <string name="login_page">Login Page</string>
+</resources>
