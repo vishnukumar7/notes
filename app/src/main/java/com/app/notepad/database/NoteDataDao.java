@@ -25,6 +25,12 @@ public interface NoteDataDao {
     @Query("select * from notes_data where notes like :data AND status='live'")
     List<NoteData> getSearchData(String data);
 
+    @Query("select * from notes_data where serverSync='not sync' AND textChanged=:data AND status='live'")
+    List<NoteData> getServerNotSync(String data);
+
+    @Query("select * from notes_data where serverSync='not sync' AND status='delete'")
+    List<NoteData> getDeleteServerNotSync();
+
     @Update
     void update(NoteData noteData);
 

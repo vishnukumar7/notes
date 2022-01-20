@@ -8,9 +8,10 @@ import android.view.WindowManager;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.app.notepad.AppController;
 import com.app.notepad.R;
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends BaseActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -21,9 +22,16 @@ setContentView(R.layout.activty_splash);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashActivity.this,LoginActivity.class));
-                finish();
+        openActivity();
             }
         },3000);
+    }
+    private void openActivity(){
+        if(AppController.getInstance().userLogged()){
+            startActivity(new Intent(SplashActivity.this,MainActivity.class));
+        }else{
+            startActivity(new Intent(SplashActivity.this,LoginActivity.class));
+        }
+        finish();
     }
 }

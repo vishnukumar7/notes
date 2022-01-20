@@ -24,11 +24,22 @@ public class NoteData implements Serializable {
     @ColumnInfo
     private String textChanged;
 
+    @ColumnInfo(name = "key_value")
+    private String keyValues;
+
     @ColumnInfo
     private String serverSync;
 
     @ColumnInfo
     private String status;
+
+    public String getKeyValues() {
+        return keyValues;
+    }
+
+    public void setKeyValues(String keyValues) {
+        this.keyValues = keyValues;
+    }
 
     public String getId() {
         return id;

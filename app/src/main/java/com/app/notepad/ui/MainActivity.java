@@ -24,7 +24,7 @@ import com.app.notepad.databinding.NotesListIitemBinding;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     public static List<NoteData> noteDataList = new ArrayList<>();
     ActivityMainBinding binding;
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
     }*/
 
     class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
-        private List<NoteData> noteDataList;
+        private final List<NoteData> noteDataList;
 
         public NoteAdapter(List<NoteData> noteDataLis) {
             this.noteDataList = noteDataLis;

@@ -1,13 +1,15 @@
 package com.app.notepad.ui;
 
+import static com.app.notepad.AppController.getCurrentDate;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import com.app.notepad.R;
@@ -15,12 +17,8 @@ import com.app.notepad.database.DatabaseClient;
 import com.app.notepad.database.NoteData;
 import com.app.notepad.databinding.ActivityAddBinding;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
 
-
-public class AddActivity extends AppCompatActivity implements TextWatcher {
+public class AddActivity extends BaseActivity implements TextWatcher {
 
     ActivityAddBinding binding;
     NoteData noteData=new NoteData();
@@ -43,6 +41,7 @@ public class AddActivity extends AppCompatActivity implements TextWatcher {
         if (from.equals("edit")){
             noteData= (NoteData) getIntent().getExtras().get("data");
             binding.text.setText(noteData.getNotes());
+            Log.d("TAG", "onCreate: "+noteData.getKeyValues());
         }
 
         binding.backBtn.setOnClickListener(new View.OnClickListener() {
@@ -57,7 +56,7 @@ public class AddActivity extends AppCompatActivity implements TextWatcher {
                 saveNotes();
             }
         });
-        currentDate=getDate();
+        currentDate=getCurrentDate();
         binding.currentDateTime.setText(currentDate);
         timeHandler.postDelayed(runnable,1000);
         binding.delete.setOnClickListener(new View.OnClickListener() {
@@ -74,12 +73,6 @@ public class AddActivity extends AppCompatActivity implements TextWatcher {
     }
 
 
-    public String getDate(){
-        SimpleDateFormat format=new SimpleDateFormat("EEE, MMM d, HH:mm:ss", Locale.getDefault());
-        return format.format(Calendar.getInstance().getTime());
-    }
-
-
     @Override
     public void onBackPressed() {
         saveNotes();
@@ -89,18 +82,22 @@ public class AddActivity extends AppCompatActivity implements TextWatcher {
         if(from.equals("edit")){
             if(!noteData.getNotes().equals(binding.text.getText().toString())){
                 noteData.setNotes(binding.text.getText().toString());
-                noteData.setCreatedTime(getDate());
+                noteData.setCreatedTime(getCurrentDate());
+                noteData.setTextChanged("olddata");
                 noteData.setServerSync("not sync");
                 noteData.setStatus("live");
+                DatabaseClient.getInstance(this).getAppDatabase().noteDataDao().insertOrUpdate(noteData);
             }
         }else{
             noteData.setId("notes-"+System.currentTimeMillis()/100);
             noteData.setNotes(binding.text.getText().toString());
-            noteData.setCreatedTime(getDate());
+            noteData.setCreatedTime(getCurrentDate());
             noteData.setServerSync("not sync");
+            noteData.setTextChanged("newdata");
             noteData.setStatus("live");
+            DatabaseClient.getInstance(this).getAppDatabase().noteDataDao().insertOrUpdate(noteData);
         }
-        DatabaseClient.getInstance(this).getAppDatabase().noteDataDao().insertOrUpdate(noteData);
+
         finish();
     }
 
