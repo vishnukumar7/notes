@@ -1,5 +1,7 @@
 package com.app.notepad.ui;
 
+import static com.app.notepad.AppController.USER_MOBILE;
+
 import android.app.ProgressDialog;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
@@ -13,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.app.notepad.AppController;
 import com.app.notepad.NetworkReceiver;
@@ -20,8 +23,10 @@ import com.app.notepad.database.DatabaseClient;
 import com.app.notepad.database.NoteData;
 import com.app.notepad.database.NoteDataDao;
 import com.app.notepad.model.AddNoteResponse;
+import com.app.notepad.model.UpdateResponse;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,6 +39,7 @@ public class BaseActivity extends AppCompatActivity implements NetworkReceiver.C
     AppController appController;
     private String TAG = "BaseActivity";
     private IntentFilter intentFilter;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,15 +56,21 @@ public class BaseActivity extends AppCompatActivity implements NetworkReceiver.C
 
     @Override
     public void onNetworkChanged(boolean isConnected) {
-        addNote();
-        updateNote();
-        Toast.makeText(BaseActivity.this, "" + isConnected, Toast.LENGTH_SHORT).show();
+        if(isConnected){
+           serverSync();
+        }
+       // Toast.makeText(BaseActivity.this, "" + isConnected, Toast.LENGTH_SHORT).show();
     }
 
     public void registerNetworkReceiver() {
         registerReceiver(networkReceiver, intentFilter);
     }
 
+    private void serverSync(){
+        addNote();
+        updateNote();
+        deleteNote();
+    }
 
     void showLoading() {
         if (!progressDialog.isShowing())
@@ -97,49 +109,6 @@ public class BaseActivity extends AppCompatActivity implements NetworkReceiver.C
     }
 
 
- /*   public void insertNote() {
-        List<NoteData> noteDataList = noteDataDao.getServerNotSync("newdata");
-        if (noteDataList.size() > 0) {
-            showLoading();
-
-            List<AddNoteRequest> noteRequestList = new ArrayList<>();
-            for (NoteData noteData : noteDataList) {
-                AddNoteRequest request = new AddNoteRequest();
-                request.setNotes(noteData.getNotes());
-                request.setCreatedtime(noteData.getCreatedTime());
-                request.setMobileno(appController.getString("user_mobile"));
-            }
-            String URL = AppController.ADD_NOTE;
-            StringRequest request = new StringRequest(Request.Method.POST, URL, new com.android.volley.Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.d(TAG, "onResponse: " + response);
-                    AddNoteResponse noteResponse = new Gson().fromJson(response, AddNoteResponse.class);
-
-                }
-            }, new com.android.volley.Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    dismissLoading();
-                    Toast.makeText(BaseActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }) {
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-
-                }
-
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String> params = new HashMap<String, String>();
-                    params.put("Content-Type", "application/json");
-                    return params;
-                }
-            };
-            appController.addToRequestQueue(request);
-        }
-    }*/
-
     public void addNote() {
         List<NoteData> noteDataList = noteDataDao.getServerNotSync("newdata");
         Log.d(TAG, "addNote: "+noteDataList.size());
@@ -149,7 +118,7 @@ public class BaseActivity extends AppCompatActivity implements NetworkReceiver.C
                 JSONObject request = new JSONObject();
                 request.put("notes", noteData.getNotes());
                 request.put("createdtime", noteData.getCreatedTime());
-                request.put("mobileno", appController.getString("user_mobile"));
+                request.put("mobileno", appController.getString(USER_MOBILE));
 
                 String URL = AppController.ADD_NOTE;
                 JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, URL, request, new Response.Listener<JSONObject>() {
@@ -163,8 +132,11 @@ public class BaseActivity extends AppCompatActivity implements NetworkReceiver.C
                             data.setCreatedTime(noteResponse.getContent().getCreatedtime());
                             data.setNotes(noteResponse.getContent().getNotes());
                             data.setId(noteData.getId());
-                            data.setServerSync("sync");
+                            data.setServerSync(AppController.SERVER_SYNC);
+                            data.setTextChanged("olddata");
+                            data.setStatus(noteData.getStatus());
                             noteDataDao.update(data);
+                            serverSync();
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -179,6 +151,7 @@ public class BaseActivity extends AppCompatActivity implements NetworkReceiver.C
             }
         }
     }
+
 
     public void updateNote() {
         List<NoteData> noteDataList = noteDataDao.getServerNotSync("olddata");
@@ -195,17 +168,52 @@ public class BaseActivity extends AppCompatActivity implements NetworkReceiver.C
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d(TAG, "updateNote onResponse: "+response);
-                        AddNoteResponse noteResponse=new Gson().fromJson(response.toString(),AddNoteResponse.class);
+                        UpdateResponse noteResponse=new Gson().fromJson(response.toString(),UpdateResponse.class);
                         if(noteResponse.getStatusCode().equals("200")){
                             NoteData data=new NoteData();
-                            data.setKeyValues(noteResponse.getContent().getKey());
-                            data.setCreatedTime(noteResponse.getContent().getCreatedtime());
-                            data.setNotes(noteResponse.getContent().getNotes());
+                            data.setKeyValues(noteData.getKeyValues());
+                            data.setCreatedTime(noteData.getCreatedTime());
+                            data.setNotes(noteData.getNotes());
                             data.setId(noteData.getId());
-                            data.setStatus("live");
+                            data.setStatus(noteData.getStatus());
                             data.setTextChanged(noteData.getTextChanged());
-                            data.setServerSync("sync");
+                            data.setServerSync(AppController.SERVER_SYNC);
                             noteDataDao.update(data);
+                            serverSync();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                });
+                appController.addToRequestQueue(req);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public void deleteNote() {
+        List<NoteData> noteDataList = noteDataDao.getDeleteServerNotSync();
+        Log.d(TAG, "deleteNote: "+noteDataList.size());
+        if (noteDataList.size() > 0) {
+            try {
+                NoteData noteData = noteDataList.get(0);
+                JSONObject request = new JSONObject();
+                request.put("key", noteData.getKeyValues());
+                Log.d(TAG, "deleteNote: "+request.toString());
+                String URL = AppController.DELETE_NOTE;
+                JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, URL, request, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, "deleteNote onResponse: "+response);
+                        UpdateResponse noteResponse=new Gson().fromJson(response.toString(),UpdateResponse.class);
+                        if(noteResponse.getStatusCode().equals("200")){
+                            noteDataDao.delete(noteData.getKeyValues());
+                            serverSync();
                         }
                     }
                 }, new Response.ErrorListener() {

@@ -16,14 +16,29 @@ public interface NoteDataDao {
     @Query("select * from notes_data where status='live'")
     List<NoteData> getAll();
 
+    @Query("select * from notes_data where status='live' order by notes")
+    List<NoteData> getAllOrderText();
+
+    @Query("select * from notes_data where status='live' order by createdTime")
+    List<NoteData> getAllOrderTime();
+
     @Query("select * from notes_data where id=:id")
     List<NoteData> getData(String id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(NoteData noteData);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insert(List<NoteData> noteData);
+
     @Query("select * from notes_data where notes like :data AND status='live'")
     List<NoteData> getSearchData(String data);
+
+    @Query("select * from notes_data where notes like :data AND status='live' order by notes")
+    List<NoteData> getSearchDataOrderText(String data);
+
+    @Query("select * from notes_data where notes like :data AND status='live' order by createdTime")
+    List<NoteData> getSearchDataOrderTime(String data);
 
     @Query("select * from notes_data where serverSync='not sync' AND textChanged=:data AND status='live'")
     List<NoteData> getServerNotSync(String data);
@@ -34,7 +49,10 @@ public interface NoteDataDao {
     @Update
     void update(NoteData noteData);
 
-    @Delete()
+    @Query("delete from notes_data where key_value=:keyValue")
+    void delete(String keyValue);
+
+    @Delete
     void delete(NoteData noteData);
 
     @Ignore

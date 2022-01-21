@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/viewAs"
+        android:orderInCategory="1"
+        android:title="@string/view_as"
+        app:showAsAction="collapseActionView">
+        <menu>
+            <group
+                android:checkableBehavior="single">
+                <item
+                    android:id="@+id/list_item"
+                    android:title="@string/list" />
+                <item
+                    android:id="@+id/grid_item"
+                    android:title="@string/grid" />
+            </group>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/sortAs"
+        android:orderInCategory="1"
+        android:title="@string/sort"
+        app:showAsAction="collapseActionView">
+        <menu>
+            <group
+                android:id="@+id/sortView"
+                android:checkableBehavior="single">
+                <item
+                    android:id="@+id/text"
+                    android:title="@string/text" />
+                <item
+                    android:id="@+id/time"
+                    android:title="@string/modified_time" />
+            </group>
+        </menu>
+    </item>
+
+</menu>

@@ -5,4 +5,11 @@
     <string name="login_with_mobile">Login With Mobile</string>
     <string name="login_page">Login Page</string>
     <string name="internet_error">Please Connect Internet</string>
+    <string name="sort">Sort</string>
+    <string name="list">list</string>
+    <string name="grid">Grid</string>
+    <string name="view_as">View as</string>
+    <string name="text">Text</string>
+    <string name="modified_time">Modified Time</string>
+    <string name="notes">Notes</string>
 </resources>

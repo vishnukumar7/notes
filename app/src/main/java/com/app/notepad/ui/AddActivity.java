@@ -8,10 +8,12 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 
+import com.app.notepad.AppController;
 import com.app.notepad.R;
 import com.app.notepad.database.DatabaseClient;
 import com.app.notepad.database.NoteData;
@@ -32,6 +34,7 @@ public class AddActivity extends BaseActivity implements TextWatcher {
             timeHandler.postDelayed(this,1000);
         }
     };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,9 +66,14 @@ public class AddActivity extends BaseActivity implements TextWatcher {
             @Override
             public void onClick(View v) {
                 if (!from.equals("add")) {
-                    noteData.setServerSync("not sync");
-                    noteData.setStatus("delete");
-                    DatabaseClient.getInstance(AddActivity.this).getAppDatabase().noteDataDao().update(noteData);
+                    if(noteData.getServerSync().equals(AppController.SERVER_NOT_SYNC)){
+                        DatabaseClient.getInstance(AddActivity.this).getAppDatabase().noteDataDao().delete(noteData);
+                    }else{
+                        noteData.setServerSync(AppController.SERVER_NOT_SYNC);
+                        noteData.setStatus("delete");
+                        DatabaseClient.getInstance(AddActivity.this).getAppDatabase().noteDataDao().update(noteData);
+                    }
+                    Toast.makeText(AddActivity.this, "Notes delete successfully", Toast.LENGTH_SHORT).show();
                 }
                 finish();
             }
@@ -80,24 +88,30 @@ public class AddActivity extends BaseActivity implements TextWatcher {
 
     public void saveNotes(){
         if(from.equals("edit")){
-            if(!noteData.getNotes().equals(binding.text.getText().toString())){
+            if(binding.text.getText().toString().isEmpty()){
                 noteData.setNotes(binding.text.getText().toString());
                 noteData.setCreatedTime(getCurrentDate());
-                noteData.setTextChanged("olddata");
-                noteData.setServerSync("not sync");
+                noteData.setServerSync(AppController.SERVER_NOT_SYNC);
+                noteData.setStatus("delete");
+                DatabaseClient.getInstance(this).getAppDatabase().noteDataDao().insertOrUpdate(noteData);
+            } else if(!noteData.getNotes().equals(binding.text.getText().toString())){
+                noteData.setNotes(binding.text.getText().toString());
+                noteData.setCreatedTime(getCurrentDate());
+                noteData.setServerSync(AppController.SERVER_NOT_SYNC);
                 noteData.setStatus("live");
                 DatabaseClient.getInstance(this).getAppDatabase().noteDataDao().insertOrUpdate(noteData);
+                Toast.makeText(AddActivity.this, "Updated", Toast.LENGTH_SHORT).show();
             }
-        }else{
+        }else if(!binding.text.getText().toString().isEmpty()){
             noteData.setId("notes-"+System.currentTimeMillis()/100);
             noteData.setNotes(binding.text.getText().toString());
             noteData.setCreatedTime(getCurrentDate());
-            noteData.setServerSync("not sync");
+            noteData.setServerSync(AppController.SERVER_NOT_SYNC);
             noteData.setTextChanged("newdata");
             noteData.setStatus("live");
             DatabaseClient.getInstance(this).getAppDatabase().noteDataDao().insertOrUpdate(noteData);
+            Toast.makeText(AddActivity.this, "Saved", Toast.LENGTH_SHORT).show();
         }
-
         finish();
     }
 

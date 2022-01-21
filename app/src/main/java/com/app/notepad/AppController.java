@@ -32,7 +32,12 @@ public class AppController extends Application {
     public static String ADD_NOTE=URL+"dev/notes/add";
     public static String UPDATE_NOTE=URL+"dev/notes/update";
     public static String DELETE_NOTE=URL+"dev/notes/delete";
-
+    public static int SORT_TYPE=0;
+    public static int SORT_TEXT=1;
+    public static int SORT_TIME=2;
+    public static String SERVER_NOT_SYNC="not sync";
+    public static String SERVER_SYNC="sync";
+    public static String USER_MOBILE="user_mobile";
     @Override
     public void onCreate() {
         super.onCreate();

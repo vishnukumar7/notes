@@ -1,15 +1,12 @@
 package com.app.notepad.ui;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import com.android.volley.Request;
@@ -18,19 +15,19 @@ import com.android.volley.toolbox.StringRequest;
 import com.app.notepad.AppController;
 import com.app.notepad.NetworkReceiver;
 import com.app.notepad.R;
+import com.app.notepad.database.NoteData;
 import com.app.notepad.databinding.ActivityLoginBinding;
+import com.app.notepad.model.Content;
+import com.app.notepad.model.ContentItem;
 import com.app.notepad.model.DataNoteResponse;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class LoginActivity extends BaseActivity {
     public static int APP_REQUEST_CODE = 100;
@@ -46,7 +43,8 @@ public class LoginActivity extends BaseActivity {
         binding.mobileLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getPhoneLogin("+919876543210");
+                //getPhoneLogin("%2B919876543210");
+                verifyMobileNumber();
             }
         });
     }
@@ -85,15 +83,30 @@ public class LoginActivity extends BaseActivity {
     private void getPhoneLogin(String mobileNo) {
         if (NetworkReceiver.isConnected()) {
             showLoading();
-            String URL=AppController.GET_NOTE+"?mobileno="+mobileNo;
+            String URL=AppController.GET_NOTE+"?mobileno="+mobileNo.replace("+","%2B");
+            Log.d(TAG, "getPhoneLogin: "+URL);
             StringRequest request=new StringRequest(Request.Method.GET, URL, new com.android.volley.Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     Log.d(TAG, "onResponse: "+response);
                     DataNoteResponse noteResponse=new Gson().fromJson(response,DataNoteResponse.class);
                     if (noteResponse.getStatusCode().equals("200")){
+
                         appController.setValues("logged",true);
-                        appController.setValues("user_mobile",mobileNo);
+                        appController.setValues(AppController.USER_MOBILE,mobileNo);
+                        Log.d(TAG, "onResponse: "+ noteResponse.getContent().size());
+                        for(ContentItem content: noteResponse.getContent()){
+                            NoteData noteData=new NoteData();
+                            noteData.setStatus("live");
+                            noteData.setNotes(content.getNotes());
+                            noteData.setTextChanged("olddata");
+                            noteData.setServerSync(AppController.SERVER_SYNC);
+                            noteData.setId("Notes-"+content.hashCode());
+                            noteData.setKeyValues(content.getKey());
+                            noteData.setCreatedTime(content.getCreatedtime());
+                            noteDataDao.insertOrUpdate(noteData);
+                        }
+
                         dismissLoading();
                         startActivity(new Intent(LoginActivity.this,MainActivity.class));
                         finish();
