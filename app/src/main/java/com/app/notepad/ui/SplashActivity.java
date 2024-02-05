@@ -6,9 +6,8 @@ import android.os.Handler;
 import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
-import com.app.notepad.AppController;
+import com.app.notepad.utils.AppController;
 import com.app.notepad.R;
 
 public class SplashActivity extends BaseActivity {
@@ -30,7 +29,7 @@ setContentView(R.layout.activty_splash);
         if(AppController.getInstance().userLogged()){
             startActivity(new Intent(SplashActivity.this,MainActivity.class));
         }else{
-            startActivity(new Intent(SplashActivity.this,LoginActivity.class));
+            startActivity(new Intent(SplashActivity.this,MobileNumberActivity.class));
         }
         finish();
     }

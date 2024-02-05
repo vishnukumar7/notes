@@ -1,6 +1,6 @@
 package com.app.notepad.ui;
 
-import static com.app.notepad.AppController.getCurrentDate;
+import static com.app.notepad.utils.AppController.getCurrentDate;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,7 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 
-import com.app.notepad.AppController;
+import com.app.notepad.utils.AppController;
 import com.app.notepad.R;
 import com.app.notepad.database.DatabaseClient;
 import com.app.notepad.database.NoteData;

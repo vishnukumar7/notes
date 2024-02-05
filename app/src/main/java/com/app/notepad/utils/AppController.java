@@ -1,4 +1,4 @@
-package com.app.notepad;
+package com.app.notepad.utils;
 
 import android.app.Application;
 import android.content.Context;

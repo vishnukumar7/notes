@@ -1,13 +1,12 @@
 package com.app.notepad.ui;
 
-import static com.app.notepad.AppController.USER_MOBILE;
+import static com.app.notepad.utils.AppController.USER_MOBILE;
 
 import android.app.ProgressDialog;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,10 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.app.notepad.AppController;
-import com.app.notepad.NetworkReceiver;
+import com.app.notepad.utils.AppController;
+import com.app.notepad.utils.NetworkReceiver;
 import com.app.notepad.database.DatabaseClient;
 import com.app.notepad.database.NoteData;
 import com.app.notepad.database.NoteDataDao;
@@ -26,7 +24,6 @@ import com.app.notepad.model.AddNoteResponse;
 import com.app.notepad.model.UpdateResponse;
 import com.google.gson.Gson;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 

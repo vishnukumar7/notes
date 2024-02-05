@@ -13,13 +13,12 @@ import android.widget.LinearLayout;
 import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import com.app.notepad.AppController;
+import com.app.notepad.utils.AppController;
 import com.app.notepad.R;
 import com.app.notepad.database.AppDatabase;
 import com.app.notepad.database.DatabaseClient;
@@ -64,13 +63,12 @@ public class MainActivity extends BaseActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 noteDataList.clear();
-                if(AppController.SORT_TYPE==AppController.SORT_TEXT){
-                    noteDataList.addAll(database.noteDataDao().getSearchDataOrderText("%"+query+"%"));
-                }
-                else if(AppController.SORT_TYPE==AppController.SORT_TIME){
-                    noteDataList.addAll(database.noteDataDao().getSearchDataOrderTime("%"+query+"%"));
-                }else{
-                    noteDataList.addAll(database.noteDataDao().getSearchData("%"+query+"%"));
+                if (AppController.SORT_TYPE == AppController.SORT_TEXT) {
+                    noteDataList.addAll(database.noteDataDao().getSearchDataOrderText("%" + query + "%"));
+                } else if (AppController.SORT_TYPE == AppController.SORT_TIME) {
+                    noteDataList.addAll(database.noteDataDao().getSearchDataOrderTime("%" + query + "%"));
+                } else {
+                    noteDataList.addAll(database.noteDataDao().getSearchData("%" + query + "%"));
                 }
                 adapter.notifyDataSetChanged();
                 return true;
@@ -79,13 +77,12 @@ public class MainActivity extends BaseActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
                 noteDataList.clear();
-                if(AppController.SORT_TYPE==AppController.SORT_TEXT){
-                    noteDataList.addAll(database.noteDataDao().getSearchDataOrderText("%"+newText+"%"));
-                }
-                else if(AppController.SORT_TYPE==AppController.SORT_TIME){
-                    noteDataList.addAll(database.noteDataDao().getSearchDataOrderTime("%"+newText+"%"));
-                }else{
-                    noteDataList.addAll(database.noteDataDao().getSearchData("%"+newText+"%"));
+                if (AppController.SORT_TYPE == AppController.SORT_TEXT) {
+                    noteDataList.addAll(database.noteDataDao().getSearchDataOrderText("%" + newText + "%"));
+                } else if (AppController.SORT_TYPE == AppController.SORT_TIME) {
+                    noteDataList.addAll(database.noteDataDao().getSearchDataOrderTime("%" + newText + "%"));
+                } else {
+                    noteDataList.addAll(database.noteDataDao().getSearchData("%" + newText + "%"));
                 }
                 adapter.notifyDataSetChanged();
                 return true;
@@ -100,32 +97,27 @@ public class MainActivity extends BaseActivity {
         return true;
     }
 
-    @SuppressLint({"NonConstantResourceId", "NotifyDataSetChanged"})
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.list_item:
-                type = 1;
-                binding.recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-                adapter.notifyDataSetChanged();
-                break;
-            case R.id.grid_item:
-                type = 0;
-                binding.recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, LinearLayout.VERTICAL));
-                adapter.notifyDataSetChanged();
-                break;
-            case R.id.text:
-                AppController.SORT_TYPE=AppController.SORT_TEXT;
-                noteDataList.clear();
-                noteDataList.addAll(database.noteDataDao().getAllOrderText());
-                adapter.notifyDataSetChanged();
-                break;
-            case R.id.time:
-                AppController.SORT_TYPE=AppController.SORT_TIME;
-                noteDataList.clear();
-                noteDataList.addAll(database.noteDataDao().getAllOrderTime());
-                adapter.notifyDataSetChanged();
-                break;
+        int itemId = item.getItemId();
+        if (itemId == R.id.list_item) {
+            type = 1;
+            binding.recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+            adapter.notifyDataSetChanged();
+        } else if (itemId == R.id.grid_item) {
+            type = 0;
+            binding.recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, LinearLayout.VERTICAL));
+            adapter.notifyDataSetChanged();
+        } else if (itemId == R.id.text) {
+            AppController.SORT_TYPE = AppController.SORT_TEXT;
+            noteDataList.clear();
+            noteDataList.addAll(database.noteDataDao().getAllOrderText());
+            adapter.notifyDataSetChanged();
+        } else if (itemId == R.id.time) {
+            AppController.SORT_TYPE = AppController.SORT_TIME;
+            noteDataList.clear();
+            noteDataList.addAll(database.noteDataDao().getAllOrderTime());
+            adapter.notifyDataSetChanged();
         }
         return true;
     }

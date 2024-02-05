@@ -1,4 +1,4 @@
-package com.app.notepad;
+package com.app.notepad.utils;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

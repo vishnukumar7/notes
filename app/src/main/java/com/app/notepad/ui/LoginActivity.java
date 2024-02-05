@@ -6,18 +6,19 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.app.notepad.AppController;
-import com.app.notepad.NetworkReceiver;
+import com.app.notepad.utils.AppController;
+import com.app.notepad.utils.NetworkReceiver;
 import com.app.notepad.R;
 import com.app.notepad.database.NoteData;
 import com.app.notepad.databinding.ActivityLoginBinding;
-import com.app.notepad.model.Content;
 import com.app.notepad.model.ContentItem;
 import com.app.notepad.model.DataNoteResponse;
 import com.firebase.ui.auth.AuthUI;
@@ -25,7 +26,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,25 +50,8 @@ public class LoginActivity extends BaseActivity {
     }
 
 
-    private void verifyMobileNumber() {
-        // Choose authentication providers
-        List<AuthUI.IdpConfig> providers = Arrays.asList(
-                new AuthUI.IdpConfig.PhoneBuilder().build());
-        // Create and launch sign-in intent
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .setTheme(R.style.OTPTheme)
-                        .build(),
-                APP_REQUEST_CODE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == APP_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
+    private ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),(result)->{
+            if (result.getResultCode() == RESULT_OK) {
                 // Successfully signed in
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -77,7 +60,20 @@ public class LoginActivity extends BaseActivity {
                 Log.i(TAG, "onActivityResultwelco: " + countrynum);
                 getPhoneLogin(countrynum);
             }
-        }
+    });
+
+
+
+    private void verifyMobileNumber() {
+        // Choose authentication providers
+        List<AuthUI.IdpConfig> providers = Arrays.asList(
+                new AuthUI.IdpConfig.PhoneBuilder().build());
+        // Create and launch sign-in intent
+        activityResultLauncher.launch(AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(providers)
+                .setTheme(R.style.OTPTheme)
+                .build());
     }
 
     private void getPhoneLogin(String mobileNo) {
@@ -85,32 +81,29 @@ public class LoginActivity extends BaseActivity {
             showLoading();
             String URL=AppController.GET_NOTE+"?mobileno="+mobileNo.replace("+","%2B");
             Log.d(TAG, "getPhoneLogin: "+URL);
-            StringRequest request=new StringRequest(Request.Method.GET, URL, new com.android.volley.Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.d(TAG, "onResponse: "+response);
-                    DataNoteResponse noteResponse=new Gson().fromJson(response,DataNoteResponse.class);
-                    if (noteResponse.getStatusCode().equals("200")){
+            StringRequest request=new StringRequest(Request.Method.GET, URL, response -> {
+                Log.d(TAG, "onResponse: "+response);
+                DataNoteResponse noteResponse=new Gson().fromJson(response,DataNoteResponse.class);
+                if (noteResponse.getStatusCode().equals("200")){
 
-                        appController.setValues("logged",true);
-                        appController.setValues(AppController.USER_MOBILE,mobileNo);
-                        Log.d(TAG, "onResponse: "+ noteResponse.getContent().size());
-                        for(ContentItem content: noteResponse.getContent()){
-                            NoteData noteData=new NoteData();
-                            noteData.setStatus("live");
-                            noteData.setNotes(content.getNotes());
-                            noteData.setTextChanged("olddata");
-                            noteData.setServerSync(AppController.SERVER_SYNC);
-                            noteData.setId("Notes-"+content.hashCode());
-                            noteData.setKeyValues(content.getKey());
-                            noteData.setCreatedTime(content.getCreatedtime());
-                            noteDataDao.insertOrUpdate(noteData);
-                        }
-
-                        dismissLoading();
-                        startActivity(new Intent(LoginActivity.this,MainActivity.class));
-                        finish();
+                    appController.setValues("logged",true);
+                    appController.setValues(AppController.USER_MOBILE,mobileNo);
+                    Log.d(TAG, "onResponse: "+ noteResponse.getContent().size());
+                    for(ContentItem content: noteResponse.getContent()){
+                        NoteData noteData=new NoteData();
+                        noteData.setStatus("live");
+                        noteData.setNotes(content.getNotes());
+                        noteData.setTextChanged("olddata");
+                        noteData.setServerSync(AppController.SERVER_SYNC);
+                        noteData.setId("Notes-"+content.hashCode());
+                        noteData.setKeyValues(content.getKey());
+                        noteData.setCreatedTime(content.getCreatedtime());
+                        noteDataDao.insertOrUpdate(noteData);
                     }
+
+                    dismissLoading();
+                    startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                    finish();
                 }
             }, new com.android.volley.Response.ErrorListener() {
                 @Override

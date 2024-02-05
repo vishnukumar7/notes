@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="divider">#1FFFFFFF</color>
     <color name="colorPrimary">#6200EE</color>
+    <color name="disabled_btn">#1F000000</color>
     <color name="colorPrimaryDark">#f1f1f1</color>
     <color name="colorAccent">#FF9100</color>
     <color name="secondaryText">#666666</color>
