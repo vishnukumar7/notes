@@ -118,6 +118,10 @@ public class MainActivity extends BaseActivity {
             noteDataList.clear();
             noteDataList.addAll(database.noteDataDao().getAllOrderTime());
             adapter.notifyDataSetChanged();
+        }else if (itemId==R.id.logout){
+            appController.setValues("logged",false);
+            startActivity(new Intent(MainActivity.this,MobileNumberActivity.class));
+            finish();
         }
         return true;
     }

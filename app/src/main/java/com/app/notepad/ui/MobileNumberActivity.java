@@ -124,7 +124,7 @@ public class MobileNumberActivity extends BaseActivity implements TextWatcher, V
         binding.otp5.addTextChangedListener(this);
         binding.otp6.addTextChangedListener(this);
 
-        startSmsUserContent();
+      //  startSmsUserContent();
 
     }
 
@@ -156,13 +156,13 @@ public class MobileNumberActivity extends BaseActivity implements TextWatcher, V
         // Check if user is signed in (non-null) and update UI accordingly.
         //FirebaseUser currentUser = mAuth.getCurrentUser();
         // updateUI(currentUser);
-        registerReceiver();
+     //   registerReceiver();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        unregisterReceiver(smsReceiver);
+      //  unregisterReceiver(smsReceiver);
     }
 
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {

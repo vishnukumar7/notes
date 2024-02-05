@@ -39,4 +39,6 @@
         </menu>
     </item>
 
+    <item android:id="@+id/logout" android:orderInCategory="1" android:title="@string/logout"/>
+
 </menu>
